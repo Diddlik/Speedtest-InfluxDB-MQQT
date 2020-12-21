@@ -26,11 +26,11 @@ This tool is a wrapper for speedtest-cli which allows you to run periodic speedt
 |:--------------|:-------------------------------------------------------------------------------------------------------------------|
 |Use			|Set *True* to use MQTT, else *False*																				 |
 |Address        |Server host of mqtt broker		                                                                                     |
-|Port           |InfluxDB port to connect to.  8086 in most cases                                                                    |
+|Port           |MQTT port to connect to.  1883 in most cases                                                                    |
 |Client         |Client ID for mqtt broker			                                                                                 |
 |Topic          |Topic to send message for mqtt broker			                                                                     |
-|Username       |User that has access to the database *(not implemnted)*                                                             |
-|Password       |Password for above user              *(not implemnted)*                                                             |
+|Username       |User that has access to the database                       					                                     |
+|Password       |Password for above user              						                                                         |
 #### SPEEDTEST
 |Key            |Description                                                                                                         |
 |:--------------|:-------------------------------------------------------------------------------------------------------------------|

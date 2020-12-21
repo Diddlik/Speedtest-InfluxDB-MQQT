@@ -28,23 +28,33 @@ class InfluxdbSpeedtest():
         self.speedtest = None
         self.results = None
     
-    #def on_connect(client, userdata, rc):
-    #    print("Connected with result code "+str(rc))
-    #    # Subscribing in on_connect() means that if we lose the connection and
-    #    # reconnect then subscriptions will be renewed.
+    def on_connect(self,mqttc, userdata, flags, rc):
+        if rc==0:
+            mqttc.connected_flag=True #set flag
+            log.info("connected OK Returned code=" + str(rc))
+        else:
+            log.critical("Bad connection Returned code=" + str(rc))
     
+    def on_disconnect(self,mqttc, userdata, rc):
+        log.critical("disconnecting reason  "  +str(rc))
+        mqttc.connected_flag=False
+        mqttc.disconnect_flag=True
 
     def _get_mqtt_connection(self):
         
-        client = mqtt.Client(client_id = config.mqtt_client)
-        #client.on_connect = on_connect
+        mqttc = mqtt.Client(client_id = config.mqtt_client)
+        mqttc.username_pw_set(config.mqtt_user, config.mqtt_password)
+        mqttc.on_connect = self.on_connect
+        mqttc.on_disconnect = self.on_disconnect
         try: 
-            client.connect(host = config.mqtt_server, port = config.mqtt_port, keepalive = 60)
+            mqttc.connect(host = config.mqtt_server, port = config.mqtt_port, keepalive = 60)
+            mqttc.loop_start()
+            
         except: 
             log.critical("connection failed")
             sys. exit(1)
 
-        return client
+        return mqttc
         
     def _get_influx_connection(self):
         """
@@ -118,6 +128,16 @@ class InfluxdbSpeedtest():
         """
         result_dict = self.results.dict()
 
+        input_point_mqtt = {
+                'download': round(result_dict['download'] / 1048576, 2),
+                'upload': round(result_dict['upload'] / 1048576, 2),
+                'ping': result_dict['server']['latency'],
+                'server': result_dict['server']['id'],
+                'server_name': result_dict['server']['name'],
+                'server_country': result_dict['server']['country']
+                }
+        
+
         input_points = [
             {
                 'measurement': 'speed_test_results',
@@ -137,7 +157,7 @@ class InfluxdbSpeedtest():
             self.write_influx_data(input_points)
         
         if config.mqtt_use:
-            self.write_mqtt_data(input_points)
+            self.write_mqtt_data(input_point_mqtt)
 
     def run_speed_test(self, server=None):
         """
