@@ -1,5 +1,8 @@
 FROM python:alpine
-MAINTAINER Barry Carey <mcarey66@gmail.com>
+LABEL maintainer="digiwo@gmail.com"
+LABEL version="0.1"
+LABEL description="Custom image t osend speedtest results to influxdb and mqtt broker"
+MAINTAINER Pavel Eremeev <digiwo@gmail.com>
 
 VOLUME /src/
 COPY influxspeedtest.py requirements.txt config.ini /src/

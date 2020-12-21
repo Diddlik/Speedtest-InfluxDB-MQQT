@@ -5,7 +5,8 @@ import speedtest
 from influxdb import InfluxDBClient
 from influxdb.exceptions import InfluxDBClientError, InfluxDBServerError
 from requests import ConnectTimeout, ConnectionError
-
+import paho.mqtt.client as mqtt
+import json
 from influxspeedtest.common import log
 from influxspeedtest.config import config
 
@@ -14,10 +15,37 @@ class InfluxdbSpeedtest():
 
     def __init__(self):
 
-        self.influx_client = self._get_influx_connection()
+        if config.influx_use:
+            self.influx_client = self._get_influx_connection()
+        else:
+            self.influx_client = None
+        
+        if config.mqtt_use:
+            self.mqtt_client = self._get_mqtt_connection()
+        else:
+            self.mqtt_client = None
+
         self.speedtest = None
         self.results = None
+    
+    #def on_connect(client, userdata, rc):
+    #    print("Connected with result code "+str(rc))
+    #    # Subscribing in on_connect() means that if we lose the connection and
+    #    # reconnect then subscriptions will be renewed.
+    
 
+    def _get_mqtt_connection(self):
+        
+        client = mqtt.Client(client_id = config.mqtt_client)
+        #client.on_connect = on_connect
+        try: 
+            client.connect(host = config.mqtt_server, port = config.mqtt_port, keepalive = 60)
+        except: 
+            log.critical("connection failed")
+            sys. exit(1)
+
+        return client
+        
     def _get_influx_connection(self):
         """
         Create an InfluxDB connection and test to make sure it works.
@@ -105,8 +133,11 @@ class InfluxdbSpeedtest():
                 }
             }
         ]
-
-        self.write_influx_data(input_points)
+        if config.influx_use:
+            self.write_influx_data(input_points)
+        
+        if config.mqtt_use:
+            self.write_mqtt_data(input_points)
 
     def run_speed_test(self, server=None):
         """
@@ -163,6 +194,17 @@ class InfluxdbSpeedtest():
             print(e)
 
         log.debug('Data written to InfluxDB')
+
+    def write_mqtt_data(self, json_data):
+        """
+        Writes the provided JSON to the database
+        :param json_data:
+        :return: None
+        """
+        log.debug(json_data)
+        print (json_data)
+        js = json.dumps(json_data)
+        self.mqtt_client.publish(config.mqtt_topic, js)
 
     def run(self):
 

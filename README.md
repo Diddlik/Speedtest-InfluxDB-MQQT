@@ -1,5 +1,6 @@
-**Speedtest.net Collector For InfluxDB and Grafana**
+**Speedtest.net Collector For InfluxDB and MQTT**
 ------------------------------
+Based on ![Barrycarey Code](https://github.com/barrycarey/Speedtest-for-InfluxDB-and-Grafana)
 
 ![Screenshot](https://puu.sh/tmfOA/b5576e88de.png)
 
@@ -14,11 +15,22 @@ This tool is a wrapper for speedtest-cli which allows you to run periodic speedt
 #### INFLUXDB
 |Key            |Description                                                                                                         |
 |:--------------|:-------------------------------------------------------------------------------------------------------------------|
-|Address        |Delay between updating metrics                                                                                      |
+|Use			|Set *True* to use InfluxDB, else *False*																			 |
+|Address        |Server host of Influxdb server                                                                                      |
 |Port           |InfluxDB port to connect to.  8086 in most cases                                                                    |
 |Database       |Database to write collected stats to                                                                                |
 |Username       |User that has access to the database                                                                                |
 |Password       |Password for above user                                                                                             |
+#### MQTT
+|Key            |Description                                                                                                         |
+|:--------------|:-------------------------------------------------------------------------------------------------------------------|
+|Use			|Set *True* to use MQTT, else *False*																				 |
+|Address        |Server host of mqtt broker		                                                                                     |
+|Port           |InfluxDB port to connect to.  8086 in most cases                                                                    |
+|Client         |Client ID for mqtt broker			                                                                                 |
+|Topic          |Topic to send message for mqtt broker			                                                                     |
+|Username       |User that has access to the database *(not implemnted)*                                                             |
+|Password       |Password for above user              *(not implemnted)*                                                             |
 #### SPEEDTEST
 |Key            |Description                                                                                                         |
 |:--------------|:-------------------------------------------------------------------------------------------------------------------|
